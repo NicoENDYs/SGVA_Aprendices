@@ -6,6 +6,7 @@ import {
   deleteAprendizDB,
 } from "./aprendiz.model.js";
 
+// Obtener todos los aprendices
 export async function getAllAprendices(req, res) {
   try {
     const aprendices = await getAprendicesDB();
@@ -16,68 +17,70 @@ export async function getAllAprendices(req, res) {
   } catch (error) {
     res.status(500).send({
       status: "error",
-      message: error.code + "=>" + error.message,
+      message: error.code + " => " + error.message,
     });
   }
 }
 
-export async function getAprendizById(id) {
+// Obtener aprendiz por ID
+export async function getAprendizById(req, res) {
   try {
-    const aprendiz = await getAprendizByIdDB(id);
-    if (!aprendiz) {
-      throw {
+    const { id } = req.params;
+    const aprendiz = await getAprendizporIdDB(id);
+
+    if (!aprendiz || aprendiz.length === 0) {
+      return res.status(404).send({
         status: "error",
         message: "Aprendiz no encontrado.",
-        statusCode: 404,
-      };
+      });
     }
+
     res.status(200).send({
       status: "ok",
       data: aprendiz,
     });
   } catch (error) {
-    // OTRA FORMA POSIBLE
-    /*   console.error("Error en AprendizService.getAprendizByIdService:", error);
-    throw {
-      status: "error",
-      message: error.message || "Error al buscar aprendiz.",
-      statusCode: error.statusCode || 500,
-    }; */
     res.status(500).send({
       status: "error",
-      message: error.code + "=>" + error.message,
+      message: error.code + " => " + error.message,
     });
   }
 }
 
+// Crear aprendiz
 export async function createAprendiz(req, res) {
   try {
-    let data = req.body;
-    // Aquí debes añadir validaciones de entrada de datos --- passport-u otra libreria  !!!!!
+    const data = req.body;
+    // TODO: añadir validaciones con Joi, Yup o express-validator
 
     const result = await createAprendizDB(data);
-    res.status(200).send({
+    res.status(201).send({
       status: "ok",
       data: result,
     });
   } catch (error) {
     res.status(500).send({
       status: "error",
-      message: error.code + "=>" + error.message,
+      message: error.code + " => " + error.message,
     });
   }
 }
 
-export async function updateAprendiz(id, data) {
+// Actualizar aprendiz
+export async function updateAprendiz(req, res) {
   try {
+    const { id } = req.params;
+    const data = req.body;
+
     const result = await updateAprendizDB(id, data);
+
     if (result.affectedRows === 0) {
-      throw {
+      return res.status(404).send({
         status: "error",
-        message: "Aprendiz no encontrado o no hubo cambios para actualizar.",
-        statusCode: 404,
-      };
+        message: "Aprendiz no encontrado o sin cambios para actualizar.",
+      });
     }
+
     res.status(200).send({
       status: "ok",
       data: result,
@@ -85,21 +88,25 @@ export async function updateAprendiz(id, data) {
   } catch (error) {
     res.status(500).send({
       status: "error",
-      message: error.code + "=>" + error.message,
+      message: error.code + " => " + error.message,
     });
   }
 }
 
-export async function deleteAprendiz(id) {
+// Eliminar aprendiz
+export async function deleteAprendiz(req, res) {
   try {
+    const { id } = req.params;
+
     const result = await deleteAprendizDB(id);
+
     if (result.affectedRows === 0) {
-      throw {
+      return res.status(404).send({
         status: "error",
         message: "Aprendiz no encontrado para eliminar.",
-        statusCode: 404,
-      };
+      });
     }
+
     res.status(200).send({
       status: "ok",
       data: result,
@@ -107,7 +114,7 @@ export async function deleteAprendiz(id) {
   } catch (error) {
     res.status(500).send({
       status: "error",
-      message: error.code + "=>" + error.message,
+      message: error.code + " => " + error.message,
     });
   }
 }

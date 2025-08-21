@@ -12,17 +12,6 @@ import cors from "cors";
 const app = express();
 app.use(express.json());
 
-/* morgan(function (tokens, req, res) {
-  return [
-    tokens.method(req, res),
-    tokens.url(req, res),
-    tokens.status(req, res),
-    tokens.res(req, res, "content-length"),
-    "-",
-    tokens["response-time"](req, res),
-    "ms",
-  ].join(" ");
-}); */
 app.use(morgan("tiny"));
 app.use(cors());
 
@@ -31,5 +20,5 @@ app.use("/ficha", ficha);
 app.use("/usuario", usuario);
 
 app.listen(process.env.PORT, () => {
-  console.log(`API ON in port: ${process.env.PORT}`);
+  console.log(`API ON in port: http://localhost:${process.env.PORT}`);
 });
